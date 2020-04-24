@@ -1,0 +1,18 @@
+<h1>Preview</h1>
+
+<p>
+  <span><%= link "Back", to: Routes.feed_path(@conn, :index) %></span> |
+  <span><%= link "Reset", to: Routes.feed_path(@conn, :preview) %></span>
+</p>
+
+<%= form_for @conn, Routes.feed_path(@conn, :preview), [method: :get], fn f -> %>
+  <%= label f, :url %>
+  <%= text_input f, :url %>
+  <%= submit "Preview" %>
+<% end %>
+
+<%= if @result do %>
+  <pre>
+    <%= show_as_json(@result) %>
+  </pre>
+<% end %>

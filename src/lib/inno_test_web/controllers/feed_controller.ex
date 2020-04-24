@@ -31,6 +31,21 @@ defmodule InnoTestWeb.FeedController do
     render(conn, "show.html", feed: feed)
   end
 
+  def preview(conn, %{"url" => url}) do
+    result =
+      case InnoTest.NetClient.retrieve(url) do
+        {:ok, body} ->
+          InnoTest.RssParser.parse(body)
+        {:error, _} ->
+          "Invalid feed url"
+      end
+    render(conn, "preview.html", result: result)
+  end
+
+  def preview(conn, _) do
+    render(conn, "preview.html", result: nil)
+  end
+
   def edit(conn, %{"id" => id}) do
     feed = Feeds.get_feed!(id)
     changeset = Feeds.change_feed(feed)

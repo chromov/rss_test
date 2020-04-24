@@ -17,6 +17,9 @@ defmodule InnoTestWeb.Router do
     pipe_through :browser
 
     get "/", FeedController, :index
+    scope "/feeds" do
+      get "/preview", FeedController, :preview
+    end
     resources "/feeds", FeedController
   end
 

@@ -1,7 +1,8 @@
 <h1>Listing Feeds</h1>
 
 <p>
-  <span><%= link "New Feed", to: Routes.feed_path(@conn, :new) %></span>
+  <span><%= link "New Feed", to: Routes.feed_path(@conn, :new) %></span> |
+  <span><%= link "Preview feed", to: Routes.feed_path(@conn, :preview) %></span>
 </p>
 
 <table>
