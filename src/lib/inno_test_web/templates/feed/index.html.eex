@@ -1,0 +1,29 @@
+<h1>Listing Feeds</h1>
+
+<p>
+  <span><%= link "New Feed", to: Routes.feed_path(@conn, :new) %></span>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>active</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for feed <- @feeds do %>
+    <tr>
+      <td><%= title_or_url(feed) %></td>
+      <td><%= feed.is_active %></td>
+
+      <td style="text-align: right">
+        <span><%= link "Show", to: Routes.feed_path(@conn, :show, feed) %></span> |
+        <span><%= link "Edit", to: Routes.feed_path(@conn, :edit, feed) %></span> |
+        <span><%= link "Delete", to: Routes.feed_path(@conn, :delete, feed), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>

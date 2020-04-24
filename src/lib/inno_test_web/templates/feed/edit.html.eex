@@ -1,0 +1,7 @@
+<h1>Edit Feed</h1>
+
+<p>
+  <span><%= link "Back", to: Routes.feed_path(@conn, :index) %></span>
+</p>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.feed_path(@conn, :update, @feed)) %>

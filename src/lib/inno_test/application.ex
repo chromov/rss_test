@@ -14,9 +14,10 @@ defmodule InnoTest.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: InnoTest.PubSub},
       # Start the Endpoint (http/https)
-      InnoTestWeb.Endpoint
-      # Start a worker by calling: InnoTest.Worker.start_link(arg)
-      # {InnoTest.Worker, arg}
+      InnoTestWeb.Endpoint,
+      InnoTest.ParseWorker,
+      InnoTest.FetchWorker,
+      :hackney_pool.child_spec(:rss_pool, [timeout: 15000, max_connections: 10])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,0 +1,46 @@
+<h1>Show Feed</h1>
+
+<p>
+  <span><%= link "Edit", to: Routes.feed_path(@conn, :edit, @feed) %></span> |
+  <span><%= link "Back", to: Routes.feed_path(@conn, :index) %></span>
+</p>
+
+<ul>
+  <li>
+    <strong>Url:</strong> <%= @feed.url %>
+  </li>
+  <li>
+    <strong>Added:</strong> <%= @feed.inserted_at %>
+  </li>
+  <li>
+    <strong>Last sync:</strong> <%= @feed.last_sync_at %>
+  </li>
+  <li>
+    <strong>active?</strong> <%= @feed.is_active %>
+  </li>
+  <li>
+    <strong>deactivated_at:</strong> <%= @feed.deactivated_at %>
+  </li>
+  <li>
+    <strong>error:</strong> <%= @feed.error %>
+  </li>
+  <li>
+    <strong>retries:</strong> <%= @feed.retries_count %>
+  </li>
+  <li>
+    <strong>title:</strong> <%= @feed.title %>
+  </li>
+  <li>
+    <strong>description:</strong> <%= @feed.description %>
+  </li>
+  <li>
+    <strong>items:</strong>
+    <ul>
+      <%= for item <- @feed.items do %>
+        <li>
+          <em><small><%= item.updated%></small></em> <%= item.title %>
+        </li>
+      <% end %>
+    </ul>
+  </li>
+</ul>

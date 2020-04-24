@@ -16,7 +16,8 @@ defmodule InnoTestWeb.Router do
   scope "/", InnoTestWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", FeedController, :index
+    resources "/feeds", FeedController
   end
 
   # Other scopes may use custom stacks.
