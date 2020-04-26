@@ -46,10 +46,20 @@ defmodule InnoTest.Feeds do
       %Feed{}
 
   """
-  def get_next() do
+  def get_next(opts \\ []) do
     interval = Application.get_env(:inno_test, :sync_interval)
-    Repo.one(from f in Feed, where: f.is_active == true and (is_nil(f.last_sync_at) or f.last_sync_at < ago(^interval, "minute")), limit: ^1)
+    except_ids = Keyword.get(opts, :except, []) |> Enum.map(fn(%Feed{id: id}) -> id end)
+    Feed
+    |> filter_by_id(except_ids)
+    |> where(is_active: true)
+    |> where([f], is_nil(f.last_sync_at) or f.last_sync_at < ago(^interval, "minute"))
+    |> limit(1)
+    |> Repo.one
   end
+
+  defp filter_by_id(query, []), do: query
+
+  defp filter_by_id(query, ids), do: query |> where([f], f.id not in ^ids)
 
   @doc """
   Creates a feed.

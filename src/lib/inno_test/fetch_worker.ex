@@ -8,21 +8,39 @@ defmodule InnoTest.FetchWorker do
 
   def init(:ok) do
     schedule()
-    {:ok, %{}}
+    {:ok, []}
   end
 
   def handle_info(:work, state) do
-    Feeds.get_next() |> fetch()
+    in_progress = state |> Enum.map(fn({_p, feed}) -> feed end)
+    tasks = Feeds.get_next(except: in_progress) |> fetch() |> List.wrap()
     schedule()
+    {:noreply, tasks ++ state}
+  end
+
+  def handle_info({:finished, feed, result}, state) do
+    result |> update_feed(feed) |> send_to_parser()
+    {:noreply, state}
+  end
+
+  def handle_info({:DOWN, _, :process, pid, _}, state) do
+    state = Enum.filter(state, fn({p, _f}) -> p != pid end)
     {:noreply, state}
   end
 
   defp fetch(%Feeds.Feed{} = feed) do
     IO.puts "fetch #{feed.url}"
-    InnoTest.NetClient.retrieve(feed.url) |> update_feed(feed) |> send_to_parser()
+
+    caller = self()
+    {:ok, pid} = Task.start(fn() ->
+      res = InnoTest.NetClient.retrieve(feed.url)
+      send(caller, {:finished, feed, res})
+    end)
+    Process.monitor(pid)
+    {pid, feed}
   end
 
-  defp fetch(_), do: false
+  defp fetch(_), do: []
 
   defp update_feed({:ok, body}, feed), do: Feeds.set_raw_feed(feed, body)
 
