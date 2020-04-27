@@ -1,7 +1,12 @@
 defmodule InnoTest.NetClient do
-
   def retrieve(url) do
-    valid_url(url) && send_request(url) || {:error, :wrong_url}
+    with {:ok, url} <- validate_url(url),
+         {:ok, _response_body} = response <- send_request(url)
+    do
+      response
+    else
+      {:error, _reason} = error -> error
+    end
   end
 
   defp send_request(url) do
@@ -17,6 +22,10 @@ defmodule InnoTest.NetClient do
     end
   end
 
-  defp valid_url(url), do: !!URI.parse(url).host
-
+  defp validate_url(url) do
+    case URI.parse(url).host do
+      nil -> {:error, :wrong_url}
+      _ -> {:ok, url}
+    end
+  end
 end
