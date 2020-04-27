@@ -48,8 +48,7 @@ defmodule InnoTest.FetchWorker do
 
   defp update_feed({:error, reason}, feed), do: Feeds.set_error_or_deactivate_feed(feed, Atom.to_string(reason))
 
-  defp send_to_parser({:ok, %Feeds.Feed{error: nil, is_active: true} = feed}),
-    do: GenServer.cast(InnoTest.ParseWorker, {:parse, feed})
+  defp send_to_parser({:ok, %Feeds.Feed{error: nil, is_active: true} = feed}), do: InnoTest.ParseWorker.parse(feed)
 
   defp send_to_parser(_), do: false
 
