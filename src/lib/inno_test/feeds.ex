@@ -8,6 +8,9 @@ defmodule InnoTest.Feeds do
 
   alias InnoTest.Feeds.Feed
 
+  @sync_interval Application.get_env(:inno_test, :sync_interval)
+  @sync_retries Application.get_env(:inno_test, :sync_retries)
+
   @doc """
   Returns the list of feeds.
 
@@ -47,12 +50,11 @@ defmodule InnoTest.Feeds do
 
   """
   def get_next(opts \\ []) do
-    interval = Application.get_env(:inno_test, :sync_interval)
     except_ids = Keyword.get(opts, :except, []) |> Enum.map(fn(%Feed{id: id}) -> id end)
     Feed
     |> filter_by_id(except_ids)
     |> where(is_active: true)
-    |> where([f], is_nil(f.last_sync_at) or f.last_sync_at < ago(^interval, "minute"))
+    |> where([f], is_nil(f.last_sync_at) or f.last_sync_at < ago(^@sync_interval, "minute"))
     |> limit(1)
     |> Repo.one
   end
@@ -132,12 +134,12 @@ defmodule InnoTest.Feeds do
       {:ok, %Feed{}}
 
   """
+  def set_error_or_deactivate_feed(%Feed{retries_count: retries} = feed, _error) when retries >= @sync_retries do
+    deactivate_feed(feed)
+  end
+
   def set_error_or_deactivate_feed(%Feed{retries_count: retries} = feed, error) do
-    if retries >= Application.get_env(:inno_test, :sync_retries) do
-      deactivate_feed(feed)
-    else
-      update_feed(feed, %{error: error, retries_count: retries + 1, last_sync_at: NaiveDateTime.utc_now})
-    end
+    update_feed(feed, %{error: error, retries_count: retries + 1, last_sync_at: NaiveDateTime.utc_now})
   end
 
   @doc """
