@@ -17,4 +17,6 @@ defmodule InnoTest.RssParser do
       end)
     )
   end
+
+  def extract(_, _items_limit), do: %{error: "Parsing error"}
 end
